@@ -1,5 +1,6 @@
 #ifndef SPI_GET_H
 #define SPI_GET_H
+#include <Arduino.h>
 
 class SPISlave {
   private:
