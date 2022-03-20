@@ -1,6 +1,8 @@
 #ifndef SPI_GET_H
 #define SPI_GET_H
 
+#include <Arduino.h>
+
 class SPISlave {
   private:
       char rxMsg[20] = "";
@@ -8,8 +10,7 @@ class SPISlave {
       bool flag2;
   public:
       SPISlave();
-      void getSpi();
-      
+      String getPID();
 };
 
 #endif

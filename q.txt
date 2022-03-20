@@ -1,0 +1,17 @@
+JFKVJ7799HKoKhK:
+    customer: XXXX
+    customer details: XXXXXX
+    template: hdfc-edu-loan
+
+templates = [
+    hdfc-edu-loan: {
+  // kya lena hai    // kaise lena hai
+        'name': 'string-input'
+        'phone': 'number-input'
+        'address': 'string-input'
+        'location': 'location'
+        'date-of-submission': 'date'
+        'university-name': 'string'
+        'amount': 'integer'
+        'interest': 'double'
+    },  sbi-home-loan, kodak-car-loan, icici-death-claim}
