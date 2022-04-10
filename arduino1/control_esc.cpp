@@ -1,5 +1,4 @@
 #include "control_esc.h"
-#include <Servo.h>
 
 #define MAX_THR 2000
 #define MIN_THR 1000

@@ -8,6 +8,8 @@ class I2C {
         I2C();
         void sendDataToArd1();
         void sendDataToArd2();
+        void receiveFromArd2();
+        void receiveFromArd1();
         void receiveThrust();
         void receiveAngle();
     private:

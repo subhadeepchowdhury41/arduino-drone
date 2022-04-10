@@ -8,13 +8,12 @@ SPISlave* slave;
 
 void setup() {
   motors = new Motors(3, 5, 6, 9);
-  pid = PID();
-  slave = SPISlave();
+  pid = new PID();
+  slave = new SPISlave();
 
   motors->calibrateEsc();
 }
 
 void loop() {
   slave->updatePID(pid);
-  
 }

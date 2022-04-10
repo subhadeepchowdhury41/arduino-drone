@@ -1,5 +1,4 @@
 #include "spi_get.h"
-#include <SPI.h>
 #include "get_pid.h"
 
 SPISlave::SPISlave() {
@@ -38,6 +37,6 @@ void SPISlave::updatePID(PID* pid) {
   }
 }
 
-SPISlave::ISR(SPI_STR_vector) {
+ISR (SPI_STR_vector) {
   flag1 = true;
 }

@@ -19,7 +19,7 @@ int I2C::readAddress() {
     return Wire.read()<<8|Wire.read();
 }
 
-int addressAvailable() {
+int I2C::addressAvailable() {
     return Wire.available();
 }
 
@@ -28,5 +28,5 @@ void I2C::requestFrom(int addr, int size) {
 }
 
 I2C::I2C() {
-    Wire.begin();
+    Wire.begin(9);
 }
