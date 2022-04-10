@@ -5,7 +5,7 @@ PID::PID() {
   pid2 = 0;
 }
 
-PID::updateFromSPI(String code) {
+void PID::updateFromSPI(String code) {
   String sub1 = code.substring(0, 4);
   String sub2 = code.substring(4, 8);
 

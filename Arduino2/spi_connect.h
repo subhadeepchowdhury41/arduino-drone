@@ -4,5 +4,10 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+class SPIMaster {
+    public:
+        void sendPID(PID* pid);
+        SPIMaster();
+};
 
 #endif

@@ -37,3 +37,7 @@ void SPISlave::updatePID(PID* pid) {
     }
   }
 }
+
+SPISlave::ISR(SPI_STR_vector) {
+  flag1 = true;
+}
