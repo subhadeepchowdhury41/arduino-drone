@@ -10,8 +10,10 @@ class SPISlave {
       char rxMsg[20] = "";
       volatile bool flag1;
       bool flag2;
+      int i;
   public:
       SPISlave();
+      void isDataComing();
       void updatePID(PID* pid);
 };
 

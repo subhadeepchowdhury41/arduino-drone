@@ -3,13 +3,15 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include "thrust.h"
 
 class I2C {
     private:
+        Thrust* thrust;
         void onRequest();
-        void onReceive4();
+        void onReceive(int size);
     public:
-        I2C();
+        I2C(Thrust* thrust);
 };
 
 #endif

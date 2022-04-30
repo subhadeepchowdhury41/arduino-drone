@@ -37,6 +37,6 @@ void SPISlave::updatePID(PID* pid) {
   }
 }
 
-ISR (SPI_STR_vector) {
+void SPISlave::isDataComing() {
   flag1 = true;
 }

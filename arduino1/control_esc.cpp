@@ -10,6 +10,20 @@ Motors::Motors(int p1, int p2, int p3, int p4) {
   m4.attach(p4);
 }
 
+void Motors::setThrust(int t1, int t2, int t3, int t4) {
+  m1.writeMicroseconds(t1);
+  m2.writeMicroseconds(t2);
+  m3.writeMicroseconds(t3);
+  m4.writeMicroseconds(t4);
+}
+
+void Motors::setThrustFromThrust(Thrust* thrust) {
+  m1.writeMicroseconds(thrust->t1);
+  m2.writeMicroseconds(thrust->t2);
+  m3.writeMicroseconds(thrust->t3);
+  m4.writeMicroseconds(thrust->t4);
+}
+
 void Motors::sendSignal(int t) {
   m1.writeMicroseconds(t);
   m2.writeMicroseconds(t);

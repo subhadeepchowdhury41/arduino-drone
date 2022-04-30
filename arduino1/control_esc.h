@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Servo.h>
+#include "thrust.h"
 
 
 class Motors {
@@ -14,6 +15,7 @@ class Motors {
       Motors(int p1, int p2, int p3, int p4);
       void calibrateEsc();
       void setThrust(int t1, int t2, int t3, int t4);
+      void setThrustFromThrust(Thrust* thrust);
 };
 
 #endif
