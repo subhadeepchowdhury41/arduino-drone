@@ -14,7 +14,6 @@ void setup() {
   motors = new Motors(3, 5, 6, 9);
   pid = new PID();
   slave = new SPISlave();
-
   motors->calibrateEsc();
 }
 
