@@ -14,7 +14,10 @@ class WifiServer {
         void handleRoot();
         void handleOnNotFound();
         void setUpServer();
-        
+        String getAngles();
+        String getPids();
+        String getThrusts();
+        String getPing();
     public:
         WifiServer();
 };

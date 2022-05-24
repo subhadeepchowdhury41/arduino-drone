@@ -29,35 +29,35 @@ void WifiServer::setUpServer() {
     server.on("/getThrusts", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send_P(200, "text/plain", getThrusts());
     });  // get thrusts
-
-
     server.on("/ping", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send_P(200, "text/plain", getPing);
     })
+
+
     // POST Methods
-    server.on("/setThrust", HTTP_POST, [](AsyncWenbServerRequest *request) {
-        request->send_P(200, "text/plain", setThrust);
-    });  // sets thrust
+//     server.on("/setThrust", HTTP_POST, [](AsyncWenbServerRequest *request) {
+//         request->send_P(200, "text/plain", setThrust);
+//     });  // sets thrust
 
-    server.on("/setPitchRollYaw", HTTP_POST, [](AsyncWenbServerRequest *request) {
-        request->send_P(200, "text/plain", setPitchRollYaw);
-    });  // sets raw, pitch and yaw
-}
+//     server.on("/setPitchRollYaw", HTTP_POST, [](AsyncWenbServerRequest *request) {
+//         request->send_P(200, "text/plain", setPitchRollYaw);
+//     });  // sets raw, pitch and yaw
+// }
 
 
-String getAngles() {
+String WifiServer::getAngles() {
     return "8080";
 }
 
 
-String getPIDs() {
+String WifiServer::getPIDs() {
     return "500500";
 }
 
-String getThrusts() {
+String WifiServer::getThrusts() {
     return "1000100010001000";
 }
 
-String getPing() {
+String WifiServer::getPing() {
     return "100";
 }
