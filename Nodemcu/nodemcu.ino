@@ -1,10 +1,11 @@
 #include "i2c_connect.h"
 #include "wifi_server.h"
 
-WifiServer* server;
+WifiServer* wifiServer;
 
 void setup() {
-    server = new WifiServer();
+  Serial.begin(9600);
+    wifiServer = new WifiServer();
 }
 
 void loop() {
