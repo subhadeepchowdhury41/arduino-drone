@@ -4,18 +4,12 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Arduino.h>
+#include "context_data.h"
 
 class WifiServer {
-    private:
-        void handleRoot();
-        void handleOnNotFound();
-        void setUpServer();
-//        String getAngles();
-        String getPIDs();
-        String getThrusts();
-        String getPing();
     public:
-        WifiServer();
+        void setUpServer();
+        WifiServer(ContextData* context);
 };
 
 #endif

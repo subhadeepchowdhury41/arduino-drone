@@ -11,17 +11,22 @@ Thrust* thrust;
 I2C* i2c;
 
 void setup() {
+  Serial.begin(9600);
+  thrust = new Thrust();
   motors = new Motors(3, 5, 6, 9);
   pid = new PID();
-  slave = new SPISlave();
-  motors->calibrateEsc();
+  
+//  slave = new SPISlave();
 }
 
 void loop() {
-  slave->updatePID(pid);
+//  slave->updatePID(pid);
+  thrust->setThrust(1300, 1300, 1300, 1300);
+  String str = thrust->getThrustString();
   motors->setThrustFromThrust(thrust);
+  Serial.println(str.length());
 }
 
-ISR (SPI_STR_vector) {
-  slave->isDataComing();
-}
+//ISR (SPI_STR_vector) {
+//  slave->isDataComing();
+//}

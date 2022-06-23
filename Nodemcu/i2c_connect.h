@@ -2,19 +2,26 @@
 #define I2C_CONNECT_H
 
 #include <Arduino.h>
+#include "context_data.h"
 
 class I2C {
     public:
-        I2C();
-        void sendDataToArd1();
-        void sendDataToArd2();
-        void receiveFromArd2();
-        void receiveFromArd1();
+        I2C(ContextData* context);
+        
         void receiveThrust();
         void receiveAngle();
+
+        void sendDataToArd1();
+        void sendDataToArd2();
+        void receiveFromArd1();
+        void receiveFromArd2();
+
     private:
-        int ard1_addr;
-        int ard2_addr;
+        ContextData* context;
+
+        int ard1_addr = 8;
+        int ard2_addr = 9;
+      
 };
 
 

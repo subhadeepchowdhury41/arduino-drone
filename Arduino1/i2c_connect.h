@@ -6,10 +6,6 @@
 #include "thrust.h"
 
 class I2C {
-    private:
-        Thrust* thrust;
-        void onRequest();
-        void onReceive(int size);
     public:
         I2C(Thrust* thrust);
 };
