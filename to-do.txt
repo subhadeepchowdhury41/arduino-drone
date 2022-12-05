@@ -1,2 +1,0 @@
-1. Nodemcu to Arduino1 I2C
-2. Get data from Arduino2 to Nodemcu
