@@ -6,6 +6,28 @@
 #define MIN_PULSE 1000
 #define MAX_PULSE 2000
 
+#define px 4
+// #define px 0
+#define ix 0.1
+// #define ix 0
+#define dx 8
+// #define dx 0
+#define py 4
+// #define py 0
+#define iy 0.1
+// #define iy 0
+#define dy 8
+// #define dy 0
+#define pz 0
+#define dz 0.5
+
+#define thres 1000
+#define pid_thres 200
+#define pid_p_i_thres 30
+#define pid_r_i_thres 30
+#define pid_p_d_thres 100
+#define pid_r_d_thres 100
+
 volatile int index = 0;
 volatile bool receivedone;
 char buff[50];
@@ -27,12 +49,6 @@ double elapsedTime = 0;
 double pid_timer = 0;
 int timer1 = 0;
 
-// const float p = 20;
-const float p = 5;
-const float i = 0;
-// const float d = 300;
-const float d = 0;
-
 float acc_x, acc_y, acc_z;
 float gyro_x, gyro_y, gyro_z;
 
@@ -48,16 +64,17 @@ volatile int req_p = 49;
 volatile int req_r = 49;
 volatile int req_y = 49;
 
-int thres = 1000;
-int pid_thres = 400;
-
 double pid_pitch = 0;
 double pitch = 0;
 double prev_pitch = 0;
 int e_p = 49;
 
 double pid_roll = 0;
+double pid_pitch_i = 0;
+double pid_pitch_d = 0;
 double roll = 0;
+double pid_roll_i = 0;
+double pid_roll_d = 0;
 double prev_roll = 0;
 int e_r = 49;
 
@@ -79,7 +96,7 @@ void esc_callibration() {
   s3.writeMicroseconds(MIN_PULSE);
   s4.writeMicroseconds(MIN_PULSE);
 
-  delay(7000);
+  delay(5000);
 
   Serial.println("Sending MIN Pulse");
   s1.writeMicroseconds(MIN_PULSE);
@@ -95,7 +112,6 @@ void imu_begin() {
   Wire.write(0x00);
   int status = Wire.endTransmission();
 
-  // // For +-8g range
   // Wire.beginTransmission(0x68);
   // Wire.write(0x1C);
   // Wire.write(0x10);
@@ -203,11 +219,11 @@ void update_imu_data() {
   // Serial.print(elapsedTime);
   // Serial.println(" ");
 
-  pitch = 0.96 * gyro_angle_x + 0.04 * acc_angle_x;
-  roll = 0.96 * gyro_angle_y + 0.04 * acc_angle_y;
+  pitch = 0.94 * gyro_angle_x + 0.06 * acc_angle_x;
+  roll = 0.94 * gyro_angle_y + 0.06 * acc_angle_y;
 
-  pitch = 0.9 * pitch + 0.1 * acc_angle_x;
-  roll = 0.9 * roll + 0.1 * acc_angle_y;
+  pitch = 0.1 * pitch + 0.9 * acc_angle_x;
+  roll = 0.1 * roll + 0.9 * acc_angle_y;
  
   // Serial.print(roll);
   // Serial.print(" ");
@@ -217,7 +233,7 @@ void update_imu_data() {
 }
 
 void setup() {
-  // Serial.begin(115200);
+  Serial.begin(115200);
 
   pinMode(on_input, INPUT);
   // pinMode(v1, INPUT);
@@ -226,11 +242,15 @@ void setup() {
   // pinMode(v4, INPUT);
   
   s1.attach(3, MIN_PULSE, MAX_PULSE);
-  s2.attach(6, MIN_PULSE, MAX_PULSE);
+  s2.attach(9, MIN_PULSE, MAX_PULSE);
   s3.attach(5, MIN_PULSE, MAX_PULSE);
-  s4.attach(9, MIN_PULSE, MAX_PULSE);
+  s4.attach(6, MIN_PULSE, MAX_PULSE);
 
   esc_callibration();
+
+  // while (!on) {
+  //   on = digitalRead(on_input);
+  // }
 
   Wire.begin();
   delay(500);
@@ -323,30 +343,50 @@ void loop() {
     index = 0;
     receivedone = false;
   }
+  
+  update_imu_data();
 
   float now = millis();
 
-  pid_pitch = p * (pitch - map(req_p, 0, 98, - 30,  30)) + (d * (pitch - prev_pitch) / (now - pid_timer));
-  pid_pitch += i * (pitch - map(req_p, 0, 98, - 30,  30)) * (now - pid_timer);
+  pid_pitch = px * (pitch - map(req_p, 0, 98, - 30,  30));
+  pid_pitch_d =  (dx * (gyro_x) / (now - pid_timer));
+  pid_pitch_i += ix * (pitch - map(req_p, 0, 98, - 30,  30)) * (now - pid_timer);
 
-  pid_roll = p * (roll - map(req_r, 0, 98, - 30,  30)) + (d * (roll - prev_roll) / (now - pid_timer));
-  pid_roll += i * (roll - map(req_r, 0, 98, - 30,  30)) * (now - pid_timer);
+  pid_roll = py * (roll - map(req_r, 0, 98, - 30,  30));
+  pid_roll_d = (dy * (gyro_y) / (now - pid_timer));
+  pid_roll_i += iy * (roll - map(req_r, 0, 98, - 30,  30)) * (now - pid_timer);
 
-  pid_yaw = p * (yaw - map(req_y, 0, 98, - 30,  30)) + (d * (yaw - prev_yaw) / (now - pid_timer));
-  // pid_yaw += i * (yaw - prev_yaw) * (now - pid_timer);
+  pid_yaw = pz * (yaw - map(req_y, 0, 98, - 30,  30)) + (dz * (gyro_z) / (now - pid_timer));
+  // pid_yaw_i = i * (yaw - prev_yaw) * (now - pid_timer);
 
   pid_timer = now;
 
   prev_pitch = pitch;
   prev_roll = roll;
   prev_yaw = yaw;
-  
-  update_imu_data();
 
-  int t1 = pid_pitch - pid_roll;
-  int t2 = pid_pitch + pid_roll;
-  int t3 = - pid_pitch - pid_roll;
-  int t4 = - pid_pitch + pid_roll;
+  pid_pitch_d = pid_pitch_d > 10 && pid_pitch_d < -10 ? 0 : pid_pitch_d;
+  pid_roll_d = pid_roll_d > 10 && pid_roll_d < -10 ? 0 : pid_roll_d;
+
+  pid_pitch_d = pid_pitch_d > pid_p_d_thres ? pid_p_d_thres : pid_pitch_d;
+  pid_roll_d = pid_roll_d > pid_r_d_thres ? pid_r_d_thres : pid_roll_d;
+  pid_pitch_d = pid_pitch_d < - pid_p_d_thres ? - pid_p_d_thres : pid_pitch_d;
+  pid_roll_d = pid_roll_d < - pid_r_d_thres ? - pid_r_d_thres : pid_roll_d;
+  
+  pid_pitch_i = pid_pitch_i > pid_p_i_thres ? pid_p_i_thres : pid_pitch_i;
+  pid_roll_i = pid_roll_i > pid_r_i_thres ? pid_r_i_thres : pid_roll_i;
+  pid_pitch_i = pid_pitch_i < - pid_p_i_thres ? - pid_p_i_thres : pid_pitch_i;
+  pid_roll_i = pid_roll_i < - pid_r_i_thres ? - pid_r_i_thres : pid_roll_i;
+
+  pid_pitch += pid_pitch_i + pid_pitch_d;
+  pid_roll += pid_roll_i + pid_roll_d;
+
+  int t1 = pid_pitch - pid_roll + pid_yaw;
+  int t2 = pid_pitch + pid_roll - pid_yaw;
+  int t3 = - pid_pitch - pid_roll + pid_yaw;
+  int t4 = - pid_pitch + pid_roll - pid_yaw;
+
+  // if (t1 > )
 
   t1 = t1 > pid_thres ? pid_thres : t1;
   t1 = t1 < -pid_thres ? -pid_thres : t1;
