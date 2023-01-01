@@ -12,7 +12,7 @@ unsigned int timer = 0;
 void setup() {
   Wire.begin(8);
   Wire.onRequest(requestEvent);
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop() {
@@ -27,10 +27,10 @@ void loop() {
 }
 
 void requestEvent() {
-  pitch = analogRead(p1);
-  roll = analogRead(p2);
-  yaw = analogRead(p3);
-  thrust = analogRead(p4);
+  pitch = pitch*0.8 + 0.2*analogRead(p1);
+  roll = roll*0.8 + 0.2*analogRead(p2);
+  yaw = yaw*0.8 + 0.2*analogRead(p3);
+  thrust = thrust*0.8 + 0.2*analogRead(p4);
 
 
   data[0] = (pitch >> 8) & 0xFF;

@@ -5,10 +5,12 @@
 #include <ArduinoJson.h>
 #include "Wire.h"
 
+#define safety_output D2
+
 const char* ssid = "Galaxy M3145A2";
 const char* pass = "subha12345";
 
-IPAddress local_IP(192, 168, 85, 66);
+IPAddress local_IP(192, 168, 126, 66);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress primaryDNS(8, 8, 8, 8);
 IPAddress secondaryDNS(8, 8, 4, 4);
@@ -26,10 +28,11 @@ int temp;
 int16_t spi_temp;
 
 bool on = false;
+int safe = 0;
 bool prev_on = false;
 
-int16_t req_th = 126, req_p = 382;
-int16_t req_r = 638, req_y = 894;
+int16_t req_th = 511, req_p = 511;
+int16_t req_r = 511, req_y = 511;
 
 const int data_led = D0;
 const int on_output = D3;
@@ -90,16 +93,16 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
         digitalWrite(on_output, on ? HIGH : LOW);
       }
 
+      digitalWrite(safety_output, safe == 1 ? HIGH : LOW);
+
       // Serial.print(data[0]); Serial.print(" ");
       // Serial.print(data[1]); Serial.print(" ");
       // Serial.print(data[2]); Serial.print(" ");
       // Serial.print(data[3]); Serial.println();
 
-      temp = map(req_th, 0, 1023, 0, 98);
+      String message = "<" + String(map(req_th, 0, 1023, 0, 98)) + "," + String(map(req_p, 0, 1023, 0, 98)) + "," + String(map(req_r, 0, 1023, 0, 98)) + "," + String(map(req_y, 0, 1023, 0, 98)) + ">";
 
-      String message = "<" + String(map(req_th, 0, 1023, 0, 98)) + "," + String(map(req_p, 0, 1023, 0, 98)) +  + "," + String(map(req_r, 0, 1023, 0, 98)) + "," + String(map(req_y, 0, 1023, 0, 98)) + ">";
-
-      Serial.println(message);
+      // Serial.println(message);
 
       byte plain[message.length() + 1];
       message.getBytes(plain, message.length() + 1);
@@ -107,17 +110,29 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
       for (int i = 0; i < message.length() + 1; i++) {
         SPI.transfer(plain[i]);
       }
-      
       break;
   }
 }
 
-void setup() {
+void handleSafety() {
+    for (int i = 0; i < server.args(); i++) {
+    if (server.argName(i).equals("status")) {
+      safe = server.arg(i).toInt();
+    }
+  }
+  server.send(200, "text/plain", String(safe));
+}
 
+// void handlePing() {
+//   server.send(200, "text/plain", String(safe));
+// }
+
+void setup() {
   pinMode(wifi_led, OUTPUT);
   pinMode(spi_led, OUTPUT);
   pinMode(data_led, OUTPUT);
   pinMode(on_output, OUTPUT);
+  pinMode(safety_output, OUTPUT);
 
   digitalWrite(wifi_led, LOW);
   digitalWrite(spi_led, LOW);
@@ -127,13 +142,19 @@ void setup() {
   Serial.begin(9600);
   setUpWifi();
   server.begin();
+  server.on("/safe", handleSafety);
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
   SPI.begin();
 
-  timer = millis();
 }
 
 void loop() {
+  timer = millis();
+  
+  // webSocket.broadcastPing()
   webSocket.loop();
+  server.handleClient();
+  Serial.println(millis()-timer);
+  
 }

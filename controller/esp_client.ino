@@ -37,20 +37,19 @@ void setUpWifi() {
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   if (type == WStype_TEXT) {
-    DeserializationError error = deserializeJson(inData, payload); // deserialize incoming Json String
-    if (error) { // Print erro msg if incomig String is not JSON formated
+    DeserializationError error = deserializeJson(inData, payload);
+    if (error) {
       Serial.print(F("deserializeJson() failed: "));
       Serial.println(error.c_str());
       return;
     }
-    // webSocket.sendTXT("OK");
   } else if (type == WStype_CONNECTED) {
     Serial.println("WS: CONNECTED");
   }
 }
 
 void setUpWebSocket() {
-  webSocket.begin("192.168.85.66", 81, "/");
+  webSocket.begin("192.168.126.66", 81, "/");
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(10000);
 }
@@ -67,9 +66,8 @@ void setup() {
 
 void loop() {
   timer = millis();
-
   if (!digitalRead(s1)) {
-    if (millis() - switch_timer > 100) {
+    if (millis() - switch_timer > 50) {
       on = !on;
       digitalWrite(s3, on ? HIGH : LOW);
       while(!digitalRead(s1)) {}
@@ -78,9 +76,7 @@ void loop() {
   } else {
     switch_timer = millis();
   }
-
-  Wire.requestFrom(8, 8); /* request & read data of size 13 from slave */
-
+  Wire.requestFrom(8, 8);
   a = Wire.read();
   b = Wire.read();
   c = Wire.read();
@@ -89,7 +85,7 @@ void loop() {
   f = Wire.read();
   g = Wire.read();
   h = Wire.read();
-  
+
   pitch = a;
   pitch = (pitch << 8) | b;
 
@@ -105,14 +101,15 @@ void loop() {
   JsonObject object = jsonData.to<JsonObject>();
 
   object["s"] = on;
-  object["t"] = thrust < 0 ?  510 : thrust;
-  object["p"] = pitch < 0 ? 510 : pitch;
-  object["r"] = roll < 0 ? 510 : roll;
-  object["y"] = yaw < 0 ? 510 : yaw;
+  object["t"] = thrust < 0 ? 511 : thrust;
+  object["p"] = pitch < 0 ? 511 : pitch;
+  object["r"] = roll < 0 ? 511 : roll;
+  object["y"] = yaw < 0 ? 511 : yaw;
 
   serializeJson(jsonData, jsonString);
-  Serial.print(jsonString); Serial.print(" ");
-  Serial.println(jsonString.length());
+  // Serial.print(jsonString); Serial.print(" ");
+  // Serial.println(jsonString.length());
+  delay(40);
 
   webSocket.sendTXT(jsonString);
 
